@@ -1,0 +1,186 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { AuthService } from './auth.service';
+import { User } from '../../entities/user.entity';
+import { OAuthToken, OAuthCode } from '../../entities/oauth.entity';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from '../user/user.service';
+import { ClientService } from './client.service';
+import * as bcrypt from 'bcrypt';
+
+describe('AuthService', () => {
+  let service: AuthService;
+  let userService: UserService;
+  let clientService: ClientService;
+
+  const mockUserRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockTokenRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockCodeRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockJwtService = {
+    sign: jest.fn(),
+    verify: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn(),
+  };
+
+  const mockUserService = {
+    findByEmail: jest.fn(),
+    findById: jest.fn(),
+  };
+
+  const mockClientService = {
+    validateClient: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AuthService,
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockUserRepository,
+        },
+        {
+          provide: getRepositoryToken(OAuthToken),
+          useValue: mockTokenRepository,
+        },
+        {
+          provide: getRepositoryToken(OAuthCode),
+          useValue: mockCodeRepository,
+        },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+        {
+          provide: UserService,
+          useValue: mockUserService,
+        },
+        {
+          provide: ClientService,
+          useValue: mockClientService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<AuthService>(AuthService);
+    userService = module.get<UserService>(UserService);
+    clientService = module.get<ClientService>(ClientService);
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  describe('login', () => {
+    const mockClientId = 'test-client-id';
+    const mockClientSecret = 'test-client-secret';
+    const mockClient = {
+      clientId: mockClientId,
+      isActive: true,
+    };
+
+    beforeEach(() => {
+      mockClientService.validateClient.mockResolvedValue(mockClient);
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
+      mockTokenRepository.create.mockReturnValue({});
+      mockTokenRepository.save.mockResolvedValue({});
+    });
+
+    it('should throw UnauthorizedException when user not found', async () => {
+      mockUserService.findByEmail.mockResolvedValue(null);
+
+      await expect(
+        service.login(
+          { email: 'test@example.com', password: 'password' },
+          mockClientId,
+          mockClientSecret,
+        ),
+      ).rejects.toThrow('Invalid credentials');
+    });
+
+    it('should throw UnauthorizedException when password is invalid', async () => {
+      const mockUser = {
+        id: '1',
+        email: 'test@example.com',
+        password: await bcrypt.hash('password', 10),
+      };
+
+      mockUserService.findByEmail.mockResolvedValue(mockUser);
+
+      await expect(
+        service.login(
+          { email: 'test@example.com', password: 'wrong-password' },
+          mockClientId,
+          mockClientSecret,
+        ),
+      ).rejects.toThrow('Invalid credentials');
+    });
+
+    it('should return tokens when credentials are valid', async () => {
+      const mockUser = {
+        id: '1',
+        email: 'test@example.com',
+        password: await bcrypt.hash('password', 10),
+        roles: ['user'],
+      };
+
+      mockUserService.findByEmail.mockResolvedValue(mockUser);
+
+      const result = await service.login(
+        { email: 'test@example.com', password: 'password' },
+        mockClientId,
+        mockClientSecret,
+      );
+
+      expect(result).toEqual({
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+      });
+    });
+  });
+
+  describe('register', () => {
+    it('should create a new user and return tokens', async () => {
+      const mockUser = {
+        id: '123',
+        email: 'test@example.com',
+        password: 'hashedPassword',
+      };
+
+      mockUserService.create.mockResolvedValue(mockUser);
+      mockJwtService.sign.mockReturnValue('mockToken');
+
+      const result = await service.register({
+        email: 'test@example.com',
+        password: 'password',
+        firstName: 'Test',
+        lastName: 'User',
+      });
+
+      expect(result).toHaveProperty('accessToken');
+      expect(result).toHaveProperty('refreshToken');
+      expect(mockUserService.create).toHaveBeenCalled();
+    });
+  });
+}); 

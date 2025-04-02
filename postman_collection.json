@@ -1,0 +1,507 @@
+{
+  "info": {
+    "name": "Project BSR API",
+    "description": "API collection for Project BSR service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"Test123!\",\n    \"firstName\": \"Test\",\n    \"lastName\": \"User\",\n    \"phoneNumber\": \"+1234567890\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "client-id",
+                "value": "{{client_id}}"
+              },
+              {
+                "key": "client-secret",
+                "value": "{{client_secret}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"Test123!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Client Credentials Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/client-credentials",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "client-credentials"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\",\n    \"scopes\": [\"read\", \"write\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "client-id",
+                "value": "{{client_id}}"
+              },
+              {
+                "key": "client-secret",
+                "value": "{{client_secret}}"
+              },
+              {
+                "key": "refresh-token",
+                "value": "{{refresh_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh-token"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Client Management",
+      "item": [
+        {
+          "name": "Create Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clients",
+              "host": ["{{base_url}}"],
+              "path": ["clients"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Client\",\n    \"description\": \"Test client for development\",\n    \"codeChallenge\": \"test-challenge\",\n    \"scopes\": [\"read\", \"write\"],\n    \"isServiceAccount\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Client",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clients/{{client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "{{client_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Client",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clients/{{client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "{{client_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Client Name\",\n    \"description\": \"Updated description\",\n    \"isActive\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Client",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/clients/{{client_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["clients", "{{client_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "File Management",
+      "item": [
+        {
+          "name": "Upload File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/files/upload",
+              "host": ["{{base_url}}"],
+              "path": ["files", "upload"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get File",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/files/{{file_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["files", "{{file_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Download File",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/files/{{file_id}}/download",
+              "host": ["{{base_url}}"],
+              "path": ["files", "{{file_id}}", "download"]
+            }
+          }
+        },
+        {
+          "name": "Delete File",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/files/{{file_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["files", "{{file_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Process File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/files/{{file_id}}/process",
+              "host": ["{{base_url}}"],
+              "path": ["files", "{{file_id}}", "process"]
+            }
+          }
+        },
+        {
+          "name": "Update File Metadata",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/files/{{file_id}}/metadata",
+              "host": ["{{base_url}}"],
+              "path": ["files", "{{file_id}}", "metadata"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"metadata\": {\n        \"description\": \"Updated file description\",\n        \"tags\": [\"document\", \"important\"]\n    }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit Logs",
+      "item": [
+        {
+          "name": "Create Audit Log",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit",
+              "host": ["{{base_url}}"],
+              "path": ["audit"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"action\": \"CREATE\",\n    \"resourceType\": \"FILE\",\n    \"resourceId\": \"{{file_id}}\",\n    \"details\": \"File uploaded successfully\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit",
+              "host": ["{{base_url}}"],
+              "path": ["audit"]
+            }
+          }
+        },
+        {
+          "name": "Get Audit Log by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit/{{audit_log_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["audit", "{{audit_log_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Audit Logs by Resource",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit/resource/{{resource_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["audit", "resource", "{{resource_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Audit Logs by User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit/user/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["audit", "user", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get My Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit/my-logs",
+              "host": ["{{base_url}}"],
+              "path": ["audit", "my-logs"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "your_access_token_here",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "your_refresh_token_here",
+      "type": "string"
+    },
+    {
+      "key": "client_id",
+      "value": "your_client_id_here",
+      "type": "string"
+    },
+    {
+      "key": "client_secret",
+      "value": "your_client_secret_here",
+      "type": "string"
+    },
+    {
+      "key": "file_id",
+      "value": "your_file_id_here",
+      "type": "string"
+    },
+    {
+      "key": "audit_log_id",
+      "value": "your_audit_log_id_here",
+      "type": "string"
+    },
+    {
+      "key": "resource_id",
+      "value": "your_resource_id_here",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "your_user_id_here",
+      "type": "string"
+    }
+  ]
+} 
